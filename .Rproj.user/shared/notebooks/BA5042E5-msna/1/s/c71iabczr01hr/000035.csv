@@ -1,0 +1,22 @@
+"0","msna %>% 
+  mutate_at(vars(modality_cash, 
+                 modality_voucher, 
+                 modality_in_kind, 
+                 modality_no_preference, 
+                 modality_all), ~ . * weight) %>% 
+  group_by(governorate, sub_district) %>% 
+  summarise(modality_cash = sum(modality_cash), 
+            modality_voucher = sum(modality_voucher), 
+            modality_in_kind = sum(modality_in_kind), 
+            modality_no_preference = sum(modality_all) + sum(modality_no_preference)) %>% 
+  adorn_percentages(""row"") %>% 
+  mutate_at(vars(modality_cash:modality_no_preference), ~ round(. * 100, digits = 2)) %>% 
+  rename_all(funs(str_replace_all(., ""modality_"", """") %>%  
+                  str_replace_all(., ""_"", "" "") %>%  
+                  str_to_title(.))) %>% 
+  flextable() %>% 
+  bg(i = 1:40, j = 3:6, bg = colourer) %>% 
+  set_table_properties(layout = ""autofit"", width = .7) %>% 
+  set_caption(""Reference table for modality preferences"")
+"
+"2","`summarise()` has grouped output by 'governorate'. You can override using the `.groups` argument."

@@ -1,0 +1,27 @@
+"0","msna %>% 
+  mutate(idp_population = is_idp * weight) %>%
+  mutate(modality_cash = modality_cash * weight) %>% 
+  group_by(governorate, admin3pcode, is_idp) %>%
+  summarise(total_pop = sum(weight), 
+            idp_pop = sum(idp_population), 
+            modality_cash = sum(modality_cash)) %>% 
+  mutate(pc_cash = modality_cash / total_pop, 
+         pc_idp = idp_pop / total_pop, 
+         is_idp = recode(is_idp, 
+                         `1` = ""IDPs"", 
+                         `0` = ""Residents"")) %>% 
+  ggplot(aes(x = total_pop, 
+             y = pc_cash)) + 
+  geom_point(aes(size = total_pop, 
+                 colour = governorate)) + 
+  scale_x_continuous(trans = ""log10"", labels = comma_format(accuracy = 1)) + 
+  geom_smooth(method = ""lm"") +
+  facet_wrap(~ is_idp, scales = ""free"") + 
+  labs(x = ""% IDP"", 
+       y = ""% prefer cash"", 
+       size = ""Pop\nweight"") + 
+  theme(strip.text = element_text(size = 10, face = ""bold""),
+        strip.background = element_rect(fill = ""#212121""), 
+        plot.title = element_text(size = 11))
+"
+"2","`summarise()` has grouped output by 'governorate', 'admin3pcode'. You can override using the `.groups` argument."

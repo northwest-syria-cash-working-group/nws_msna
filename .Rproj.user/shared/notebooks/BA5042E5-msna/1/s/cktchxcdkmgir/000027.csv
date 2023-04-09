@@ -1,0 +1,9 @@
+"0","msna %>%
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  glm(modality_cva ~ pc_food, data = ., family = ""binomial"") %>%
+  summary() %>% 
+  tidy()
+"
+"2","Error: No tidy method for objects of class summary.glm
+"

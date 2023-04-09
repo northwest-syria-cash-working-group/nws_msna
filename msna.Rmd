@@ -1,0 +1,812 @@
+---
+title: "Untitled"
+output: html_document
+date: '2023-04-06'
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(scales)
+library(janitor)
+library(haven)
+library(psych)
+library(mdepriv)
+library(broom)
+library(readxl)
+library(widyr)
+library(DT)
+library(viridis)
+library(randomForest)
+library(broomstick)
+library(patchwork)
+library(tidymodels)
+library(tidytext)
+library(flextable)
+library(RColorBrewer)
+library(lubridate)
+library(sf)
+
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+range_wna <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
+
+mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+opts <- options(knitr.kable.NA = "")
+
+`%out%` <- Negate(`%in%`)
+
+# function for transposing df
+transpose_df <- function(df) {
+  t_df <- data.table::transpose(df)
+  colnames(t_df) <- rownames(df)
+  rownames(t_df) <- colnames(df)
+  t_df <- t_df %>%
+    tibble::rownames_to_column(.data = .) %>%
+    tibble::as_tibble(.)
+  return(t_df)
+}
+
+# disabling scientific notation
+options(scipen = 999)
+
+theme_set(theme_light())
+```
+
+# Data 
+
+```{r warning=FALSE}
+
+pcode3_shape <- 
+  st_read("./data/syr_admbnda_uncs_unocha_20201217/syr_admbnda_adm3_uncs_unocha_20201217.shp", 
+          quiet = TRUE)
+
+pop <- read_excel("./data/monthly_displacement_northen_syria_november_2022.xlsx") %>% 
+  clean_names() %>% 
+  # You really need to remember how to do this
+  rename_all(
+    funs(
+      str_replace_all(., "id_ps", "idps") %>%
+        str_replace_all(., "h_hs", "hhs"))) %>% 
+  mutate(total_pop = population_individuals + idps_individuals)
+
+locations <- read_excel("./data/Locations.xlsx") %>% 
+  clean_names()
+
+nw <- read_excel("./data/2023HNO_PiN_Severity_detailedAoI_FORSHARE 15032023.xlsx", skip = 1, 
+                  sheet = 1) %>%
+  clean_names() %>% 
+  filter(ao_c == "NW") %>% 
+  pull(admin3pcode)
+
+msna_names <- read_excel("./data/2022-09-06_SYR_MSNA2022_dataset_HHs.xlsx", 
+           sheet = "Dataset - households") %>% 
+  head(1) %>% transpose_df() %>% 
+  mutate(col_id = paste0("c" , row_number())) %>% 
+  select(col_id, rowname)
+
+msna <- read_excel("./data/2022-09-06_SYR_MSNA2022_dataset_HHs.xlsx", 
+           sheet = "Dataset - households") %>% 
+  setNames(msna_names %>% pull(col_id)) %>% 
+  separate(c3, c("admin1pcode", "governorate"), sep = " - ") %>% 
+  separate(c4, c("admin2pcode", "district"), sep = " - ") %>% 
+  separate(c5, c("admin3pcode", "sub_district"), sep = " - ") %>% 
+  rename(admin4pcode = c7) %>% 
+  filter(c750 == "NWS") %>% 
+  select(id = c1,
+         weight = c2,
+         idp_site = c8, 
+         site_type = c9,
+         admin1pcode,
+         admin2pcode, 
+         admin3pcode, 
+         admin4pcode,
+         governorate, 
+         district, 
+         sub_district, 
+         rcsi = c739, 
+         hoh_employ = c732, 
+         pop_group_sex = c729, 
+         hoh_sex = c730, 
+         hoh_employ = c732, 
+         pop_group = c749, 
+         diplacement_year = c746, 
+         return_year = c747, 
+         shelter_type = c414,
+         modality_preference = c722,
+         modality_cash = c723,
+         modality_voucher = c724, 
+         modality_in_kind = c725, 
+         modality_all = c726, 
+         modality_no_preference = c727, 
+         modality_no_answer = c728, 
+         income_n = c629, 
+         income_currency = c630, 
+         income_syp = c631, 
+         income_try = c632, 
+         exp_rent = c633, 
+         exp_shelter_maintain = c634, 
+         exp_food = c635, 
+         exp_electricity = c636, 
+         exp_fuel = c637, 
+         exp_edu = c638, 
+         exp_health = c639, 
+         exp_disability = c640, 
+         exp_clothing = c641, 
+         exp_water = c642, 
+         exp_hygiene_items = c643, 
+         exp_nfi = c644, 
+         exp_transportation = c645,
+         exp_telecom = c646, 
+         exp_debt = c647,
+         exp_productive_assets = c648, 
+         exp_other = c649, 
+         total_expenditures = c650,
+         meet_basic_needs = c622, 
+         unable_needs_first = c623, 
+         unable_needs_second = c625, 
+         unable_needs_third = c627, 
+         priority_need_first = c616, 
+         priority_need_second = c618, 
+         priority_need_third = c620, 
+         barrier_n = c585, 
+         barrier_low_wages = c586, 
+         barrier_lack_opportunities = c587, 
+         barrier_lack_experience = c588, 
+         barrier_expertise_mismatch = c589, 
+         barrier_working_conditions = c590, 
+         barrier_lack_id = c591, 
+         barrier_physical_access = c592, 
+         barrier_care_responsibilities = c593, 
+         barrier_lack_clarity = c594, 
+         barrier_lack_connections = c595, 
+         barrier_woman = c596, 
+         barrier_idp = c597, 
+         barrier_disability = c598,
+         barrier_agriculture_livestock = c599,
+         barrier_too_old = c600,
+         barrier_no_barrier = c601, 
+         hours_electricity = c567, 
+         electricity_grid = c569,
+         electricity_communal_generator = c570, 
+         electricity_private_generator = c571, 
+         electricity_renewable = c572, 
+         electricity_batteries = c573, 
+         items_unable_to_afford = c460, 
+         all_items_available = c439, 
+         unavailable_thermal_blanket = c440, 
+         unavailable_blanket = c441, 
+         unavailable_mattress = c442, 
+         unavailable_cooking_kit = c443, 
+         unavailable_cooking_fuel = c444, 
+         unavailable_mosquito_net = c445, 
+         unavailable_jerry_can = c446, 
+         unavailable_plastic_sheeting = c447, 
+         unavailable_torches = c448, 
+         unavailable_generators = c449, 
+         unavailable_adult_clothing = c450, 
+         unavailable_child_clothing = c451, 
+         unavailable_winter_clothing = c452, 
+         unavailable_shoes = c453, 
+         unavailable_heaters = c454, 
+         unavailable_heating_fuel = c455,
+         shelter_no_damage = c419, 
+         shelter_small_holes_cracks = c420, 
+         shelter_big_holes_cracks = c421, 
+         shelter_collapsed_roof_floor_walls = c422, 
+         shelter_completely_destroyed = c423, 
+         num_children = c283, 
+         explosions = c269, 
+         civil_documentation = c213,
+         population_type = c136, 
+         host_pop_ever_displaced = c137, 
+         respondent_sex = c10, 
+         employed_3_months = c17, 
+         employment_type = c18, 
+         hh_size = c19, 
+         hoh_attended_school = c20, 
+         hoh_education = c21, 
+         respondent_plw = c16, 
+         respondent_married = c15, 
+         children_under_2 = c11) %>% 
+  mutate_at(vars(modality_cash:modality_no_answer, 
+                 barrier_low_wages:barrier_no_barrier,
+                 electricity_grid:electricity_batteries,
+                 all_items_available:shelter_completely_destroyed),
+            ~ as.numeric(.)) %>% 
+  # some expenditure figures are in SYP and need to be converted
+  #FX rate from 02 August 2022, midpoint of the survey
+  mutate(total_expenditures = ifelse(income_currency == "Syrian Pounds (SYP)", 
+                                     total_expenditures / 28.577, 
+                                     total_expenditures), 
+         income_try = ifelse(!is.na(income_syp), 
+                             income_syp / 28.577, 
+                             income_try),
+         exp_per_capita = total_expenditures / hh_size, 
+         basic_needs = ifelse(meet_basic_needs %in% c("Adequate", 
+                                                      "Easily able to meet needs"), 
+                              "adequate", 
+                              "inadequate"), 
+         exp_per_capita = total_expenditures / hh_size) %>% 
+  mutate(pop_group_red = case_when(pop_group %in% c("IDPs in Collective center", 
+                                       "IDPs in Planned camp", 
+                                       "IDPs in Self-settled and/or informal camp", 
+                                       "IDPs out of IDP sites") ~ "idp", 
+                                   pop_group == "Returnees" ~ "returnees", 
+                                   pop_group == "Residents" ~ "residents")) %>% 
+  mutate(children_under_2 = 
+           case_when(children_under_2 %in% c("There are no children under 2 years") ~ 0, 
+                     children_under_2 %in% c("Yes", "No") ~ 1), 
+         is_idp = ifelse(pop_group_red == "idp", 1, 0)) %>% 
+  # Why has nobody cleaned this dataset?
+  mutate_at(vars(exp_rent:exp_other), 
+            ~ ifelse(income_currency == "Syrian Pounds (SYP)", . / 28.577, .)) %>% 
+  mutate(modality_cva = case_when(modality_voucher == 1 ~ 1, 
+                         modality_cash == 1 ~ 1, 
+                         TRUE ~ 0))
+
+
+```
+
+
+
+
+### Sex of household
+
+Overall, there is only a very slight difference in the median expenditures per capita of female-headed households as opposed to male-headed ones. Expenditures have been chosen over income as they are indicative of consumption.  
+
+<br>
+
+```{r}
+
+hoh_sex_labs <- msna %>% 
+  group_by(hoh_sex) %>% 
+  summarise(exp_per_capita = mean(exp_per_capita, na.rm = TRUE), 
+            pct75 = quantile(total_expenditures / hh_size, na.rm = TRUE, .75), 
+            pct25 = quantile(total_expenditures / hh_size, na.rm = TRUE, .25))
+
+msna %>% 
+  ggplot(aes(x = exp_per_capita)) +
+  geom_histogram() + 
+  scale_x_continuous(trans = "log10", labels = comma, 
+                     breaks = c(100, 300, 1000, 3000, 10000)) +
+  geom_vline(aes(xintercept = mean(exp_per_capita, na.rm = TRUE)),
+             colour = "blue", lty = 2, alpha = .7) +
+  geom_vline(aes(xintercept = median(exp_per_capita, na.rm = TRUE)),
+             colour = "green", lty = 2, alpha = .7) +
+  geom_text(aes(label = round(exp_per_capita, digits = 0)), data = hoh_sex_labs, 
+            y = 500, hjust = -.4, colour = "blue") +
+  labs(title = "Histogram of monthly household expenditures per capita", 
+       subtitle = "Mean marked in blue, median in green", 
+       x = "Expenditures per capita", 
+       y = "Count of households") + 
+  facet_wrap(~ hoh_sex) + 
+  theme(legend.position = "none",
+        strip.text = element_text(size = 10, face = "bold"),
+        strip.background = element_rect(fill = "#212121"), 
+        plot.title = element_text(size = 11))
+  
+
+
+```
+
+
+<br>
+
+Whilst there is little difference in the median expenditures per capita, male-headed households tend to have much higher means (pun intended). We can clearly see from the plot above that this difference is explained by the much better defined high-end of the spectrum on the `Male` side of the plot. This means that a far greater proportion of high-consumption households are headed by men, and that once these are accounted for, incomes of female- and male-headed households are markedly similar.  
+
+Programmatically, these high-consumption households should not be targeted anyway. 
+
+So to better understand this phenomenon, let us filter out these high-consumption households (I will apply an arbitrary threshold of TRY 2,000 per capita) and examine the statistics: 
+
+
+
+```{r}
+
+rbind(
+  msna %>%
+    filter(!is.na(total_expenditures)) %>% 
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0)) %>% 
+    filter(exp_per_capita < 2000) %>% 
+    lm(exp_per_capita ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>%
+    mutate(term = "Expenditures per capita filtered") %>% 
+    select(term, estimate, p.value), 
+  
+  msna %>% 
+    filter(income_try != 0) %>% 
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0), 
+           income_per_capita = income_try / hh_size) %>% 
+    filter(exp_per_capita < 2000) %>% 
+    lm(income_per_capita ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>% 
+    mutate(term = "Income per capita filtered") %>% 
+    select(term, estimate, p.value),
+  
+  msna %>%  
+    filter(!is.na(rcsi)) %>% 
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0), 
+           income_per_capita = income_try / hh_size) %>% 
+    filter(exp_per_capita < 2000) %>% 
+    lm(rcsi ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>% 
+    mutate(term = "rCSI filtered") %>% 
+    select(term, estimate, p.value), 
+  
+   msna %>%
+    filter(!is.na(total_expenditures)) %>%  
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0)) %>% 
+    lm(exp_per_capita ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>%
+    mutate(term = "Expenditures per capita all") %>% 
+    select(term, estimate, p.value), 
+  
+  msna %>% 
+    filter(income_try != 0) %>% 
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0), 
+           income_per_capita = income_try / hh_size) %>% 
+    lm(income_per_capita ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>% 
+    mutate(term = "Income per capita all") %>% 
+    select(term, estimate, p.value), 
+  
+  msna %>%  
+    filter(!is.na(rcsi)) %>% 
+    mutate(is_female = ifelse(hoh_sex == "Female", 1, 0), 
+           income_per_capita = income_try / hh_size) %>% 
+    lm(rcsi ~ is_female, data = .) %>% 
+    summary() %>% 
+    tidy() %>% 
+    filter(term != "(Intercept)") %>% 
+    mutate(term = "rCSI all") %>% 
+    select(term, estimate, p.value)
+  
+  ) %>% 
+  mutate_at(vars(p.value), ~ formatC(., format = "e", digits = 3)) %>% 
+  flextable() %>% 
+  set_table_properties(layout = "autofit", width = .6) %>% 
+  theme_zebra() %>% 
+  bg(i = ~ p.value == "4.885e-01", bg = "#eecccc", j = 3) %>% 
+  set_caption("Effects of sex of HoH on Expenditures, Income and rCSI") %>% 
+  footnote(i = 1:3, j = 1,  
+           as_paragraph("Only households with expenditures per capita below TRY 2,000"))
+
+
+   
+```
+
+<br>
+
+When looking at only households whose expenditures per capita are less than TRY 2,000, the differences in income and expenditures are much less stark (though the results of the filtered expenditures per capita are not statistically significant, likely due to the reduced sample size). However, differences in rCSI are persistent, resulting in at least a 3.4-point-increase in rCSI scores (higher scores are worse), independent of whether the household has high consumption or not. 
+
+Programmatically, this means that whilst the lower means of female-headed households may be addressed by cash transfers and other interventions, there are behavioural patterns that persist independent of consumption level. 
+
+Ultimately, this aligns with our broader understanding of the multidimensionality of gender -- addressing disparities with material interventions might not result in the desired decrease in rCSI scores. I leave this up to the Gender Advisor to take this further and isolate the specific behavioural differences. 
+
+<br><br><br>
+
+# Modalities
+
+
+### Shelter types
+
+No clear patterns for modality preferences, it is probably best to follow preferences at the community level. 
+
+
+
+```{r}
+msna %>% 
+  mutate(idp_population = is_idp * weight) %>%
+  mutate(modality_cash = modality_cash * weight) %>% 
+  group_by(governorate, admin3pcode, is_idp) %>%
+  summarise(total_pop = sum(weight), 
+            idp_pop = sum(idp_population), 
+            modality_cash = sum(modality_cash)) %>% 
+  mutate(pc_cash = modality_cash / total_pop, 
+         pc_idp = idp_pop / total_pop, 
+         is_idp = recode(is_idp, 
+                         `1` = "IDPs", 
+                         `0` = "Residents")) %>% 
+  ggplot(aes(x = total_pop, 
+             y = pc_cash)) + 
+  geom_point(aes(size = total_pop, 
+                 colour = governorate)) + 
+  scale_x_continuous(trans = "log10", labels = comma_format(accuracy = 1)) + 
+  geom_smooth(method = "lm") +
+  facet_wrap(~ is_idp, scales = "free") + 
+  labs(x = "% IDP", 
+       y = "% prefer cash", 
+       size = "Pop\nweight") + 
+  theme(strip.text = element_text(size = 10, face = "bold"),
+        strip.background = element_rect(fill = "#212121"), 
+        plot.title = element_text(size = 11))
+ 
+```
+
+```{r}
+msna %>% 
+  mutate(shelter_type = fct_lump(shelter_type, n = 5), 
+         is_idp = recode(is_idp,
+                         `1` = "IDP", 
+                         `0` = "Non_IDP")) %>% 
+  group_by(is_idp, shelter_type) %>% 
+  summarise(weight = sum(weight), 
+            .groups = "drop") %>%
+  pivot_wider(names_from = is_idp, values_from = weight) %>% 
+  adorn_percentages("col") %>% 
+  mutate_at(vars(IDP, Non_IDP), ~ round(. * 100, digits = 2)) %>%
+  mutate(Non_IDP = ifelse(Non_IDP < 0.01, NA_real_, Non_IDP)) %>% 
+  flextable() %>% 
+  theme_zebra() %>% 
+  set_table_properties(layout = "autofit", width = .5)
+```
+
+
+```{r}
+msna %>% 
+  mutate(non_house = 
+           ifelse(shelter_type %in% c("House/ apartment (finished)",
+                                      "House/ apartment (unfinished)"), 1, 0)) %>% 
+  mutate(modality_no_preference = modality_no_preference + modality_all, 
+         cva = case_when(modality_voucher == 1 ~ 1, 
+                         modality_cash == 1 ~ 1, 
+                         TRUE ~ 0)) %>% 
+  mutate_at(vars(non_house, 
+                 modality_cash, 
+                 modality_voucher,
+                 modality_in_kind,
+                 modality_no_preference, 
+                 cva), ~ . * weight) %>% 
+  group_by(admin3pcode) %>% 
+  summarise(non_house = sum(non_house), 
+            cash = sum(modality_cash), 
+            voucher = sum(modality_voucher), 
+            in_kind = sum(modality_in_kind), 
+            no_preference = sum(modality_no_preference), 
+            cva = sum(cva),
+            pop = sum(weight)) %>% 
+  mutate(cva_pc = cva / pop, 
+         non_house_pc = non_house / pop) %>% 
+  ggplot(aes(x = non_house_pc, y = cva_pc)) + 
+  geom_smooth(method = "lm") +
+  geom_point() + 
+  scale_x_continuous(labels = percent) + 
+  scale_y_continuous(labels = percent) + 
+  labs(x = "% not in houses/apartments", 
+       y = "% prefer only CVA", 
+       title = "No clear pattern on CVA preference and shelter types")
+  
+```
+
+```{r}
+mutate(modality_no_preference = modality_no_preference + modality_all, 
+         cva = case_when(modality_voucher == 1 ~ 1, 
+                         modality_cash == 1 ~ 1, 
+                         TRUE ~ 0)) 
+
+msna %>% 
+  {sum(.$all_items_available)}
+```
+
+### Food expenditures
+
+Food expenditures do not seem 
+
+```{r}
+
+food_labs <- msna %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         modality_cva = recode(modality_cva, 
+                               `1` = "Only CVA", 
+                               `0` = "Mixed modalities")) %>% 
+  group_by(modality_cva) %>% 
+  summarise(pc_food = mean(pc_food, na.rm = TRUE)) 
+  
+
+msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         modality_cva = recode(modality_cva, 
+                               `1` = "Only CVA", 
+                               `0` = "Mixed modalities")) %>%
+  ggplot(aes(x = pc_food)) + 
+  geom_histogram() + 
+  scale_x_log10(labels = percent) + 
+  geom_vline(aes(xintercept = mean(pc_food, na.rm = TRUE)), 
+             colour = "blue", lty = 2, alpha = .7) +
+  geom_text(aes(label = percent(pc_food, accuracy = .1)),  
+            y = 300, hjust = -.1, 
+            data = food_labs) + 
+  facet_wrap(~ modality_cva)
+
+msna %>% count(modality_cva)
+
+```
+
+```{r}
+msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         modality_cva = recode(modality_cva, 
+                               `1` = "Only CVA", 
+                               `0` = "Mixed modalities")) %>%
+  ggplot(aes(x = pc_food)) + 
+  geom_histogram() + 
+  scale_x_log10(labels = percent) + 
+  geom_vline(aes(xintercept = mean(pc_food, na.rm = TRUE)), 
+             colour = "blue", lty = 2, alpha = .7) +
+  geom_text(aes(label = percent(pc_food, accuracy = .1)),  
+            y = 300, hjust = -.1, 
+            data = food_labs) + 
+  facet_wrap(~ modality_cva)
+```
+
+
+```{r}
+# Why is the geom_vline not moving? 
+# In the end, you still need to pre-calculate the means 
+
+msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         modality_cva = recode(modality_cva, 
+                               `1` = "Only CVA", 
+                               `0` = "Mixed modalities")) %>%
+  ggplot(aes(x = pc_food)) + 
+  geom_histogram() + 
+  facet_wrap(~ meet_basic_needs) + 
+  geom_vline(aes(xintercept = mean(pc_food, na.rm = TRUE), 
+                 group = meet_basic_needs), 
+             colour = "blue", lty = 2, alpha = .7) 
+  geom_text(aes(label = percent(pc_food, accuracy = .1)),  
+            y = 300, hjust = -.1, 
+            data = msna %>%
+              mutate(pc_food = exp_food / total_expenditures) %>%
+              group_by(meet_basic_needs) %>%
+              summarise(pc_food = mean(pc_food, na.rm = TRUE))) 
+
+```
+<br> 
+
+Percentage of expenditures spent on food is a good proxy of whether a household is able to meet its basic needs. This is commonsensical. A sensible cut-off between those able and unable to meet their basic needs seems to be around 41% of total expenditures spent on food. 
+
+```{r}
+msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         meet_basic_needs = fct_relevel(meet_basic_needs, 
+                                        c("Easily able to meet needs",
+                                          "Adequate",
+                                          "Insufficient",
+                                          "Completely unable"))) %>% 
+  mutate_at(vars(exp_food, total_expenditures, modality_cva, modality_in_kind), 
+            ~ . * weight) %>% 
+  group_by(meet_basic_needs) %>% 
+  summarise(exp_food = sum(exp_food, na.rm = TRUE), 
+            total_expenditures = sum(total_expenditures, na.rm = TRUE), 
+            in_kind = sum(modality_in_kind, na.rm = TRUE), 
+            cva = sum(modality_cva, na.rm = TRUE), 
+            pop = sum(weight)) %>% 
+  mutate(pc_food = exp_food / total_expenditures, 
+         cva = cva / pop, 
+         in_kind = in_kind / pop) %>% 
+  mutate_at(vars(pc_food, cva, in_kind), ~ round(. * 100, digits = 2)) %>% 
+  select(-exp_food, -total_expenditures, -pop)
+```
+
+```{r}
+
+house_food_labs <- msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(non_house = 
+           ifelse(shelter_type %in% c("House/ apartment (finished)",
+                                      "House/ apartment (unfinished)"), 
+                  "House / apartment", "Makeshift, tent and other"), 
+         pc_food = exp_food / total_expenditures) %>%
+  group_by(non_house) %>% 
+  summarise(pc_food = mean(pc_food))
+
+msna %>% 
+  mutate(non_house = 
+           ifelse(shelter_type %in% c("House/ apartment (finished)",
+                                      "House/ apartment (unfinished)"), 
+                  "House / apartment", "Makeshift, tent and other")) %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  ggplot(aes(x = pc_food)) + 
+  geom_histogram() + 
+  geom_vline(data = house_food_labs, aes(xintercept = pc_food), 
+             colour = "blue", lty = 2) + 
+  geom_text(data = house_food_labs, aes(label = percent(pc_food, accuracy = .1)), 
+            y = 340, hjust = -.15) + 
+  scale_x_continuous(labels = percent) + 
+  facet_wrap(~ non_house)
+  
+```
+
+#### Why pc_food over rCSI 
+
+rCSI do not not provide sufficient defintion in the population and are therefore, not as useful a metric. 
+
+```{r}
+msna %>% 
+  mutate(non_house = 
+           ifelse(shelter_type %in% c("House/ apartment (finished)",
+                                      "House/ apartment (unfinished)"), 
+                  "House / apartment", "Makeshift, tent and other")) %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  ggplot(aes(x = rcsi)) + 
+  geom_histogram() + 
+  # geom_vline(data = house_food_labs, aes(xintercept = pc_food), 
+  #            colour = "blue", lty = 2) + 
+  # geom_text(data = house_food_labs, aes(label = percent(pc_food, accuracy = .1)), 
+  #           y = 340, hjust = -.15) + 
+  scale_x_continuous(trans = "log10") + 
+  facet_wrap(~ non_house)
+```
+
+
+
+```{r}
+
+tidy_summary <- function(tbl) {
+  
+  tbl %>% 
+    summary() %>%
+    tidy() %>% 
+    filter(term != "(Intercept)") %>%
+    select(term, estimate, p.value)
+}
+
+
+msna %>%
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  glm(modality_cva ~ pc_food, data = ., family = "binomial") %>%
+  summary() %>% 
+  tidy()
+  tidy_summary() 
+
+
+msna %>% 
+  filter(!is.na(total_expenditures)) %>%  
+  lm(modality_cva ~ rcsi, data = .) %>% 
+  tidy_summary()
+  
+    
+    
+  
+  
+  mutate_at(vars(p.value), ~ formatC(., format = "e", digits = 3)) %>% 
+  flextable() %>% 
+  set_table_properties(layout = "autofit", width = .6) %>% 
+  theme_zebra() %>% 
+  bg(i = ~ p.value == "4.885e-01", bg = "#eecccc", j = 3) %>% 
+  set_caption("Effects of sex of HoH on Expenditures, Income and rCSI") %>% 
+  footnote(i = 1:3, j = 1,  
+           as_paragraph("Only households with expenditures per capita below TRY 2,000"))
+  
+msna %>% filter(is.na(total_expenditures))
+
+msna %>% 
+  {sum(.$shelter_no_damage, na.rm = TRUE)}
+
+msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  mutate_at(vars(modality_cva, rcsi, pc_food), ~ . * weight) %>% 
+  group_by(admin3pcode) %>% 
+  summarise(pop = sum(weight), 
+            cva = sum(modality_cva, na.rm = TRUE), 
+            rcsi = sum(rcsi, na.rm = TRUE), 
+            pc_food = sum(pc_food, na.rm = TRUE)) %>% 
+  mutate(cva = cva / pop, 
+         rcsi = rcsi / pop) %>% 
+  lm(cva ~ pc_food, data = .) %>% 
+  summary()
+
+```
+
+```{r}
+msna %>% glimpse()
+```
+
+
+
+```{r}
+colourer <- col_numeric(
+  palette = c("wheat", "red"),
+  domain = c(0, 100))
+
+msna %>% 
+  mutate_at(vars(modality_cash, 
+                 modality_voucher, 
+                 modality_in_kind, 
+                 modality_no_preference, 
+                 modality_all), ~ . * weight) %>% 
+  group_by(governorate, sub_district) %>% 
+  summarise(modality_cash = sum(modality_cash), 
+            modality_voucher = sum(modality_voucher), 
+            modality_in_kind = sum(modality_in_kind), 
+            modality_no_preference = sum(modality_all) + sum(modality_no_preference)) %>% 
+  adorn_percentages("row") %>% 
+  mutate_at(vars(modality_cash:modality_no_preference), ~ round(. * 100, digits = 2)) %>% 
+  rename_all(funs(str_replace_all(., "modality_", "") %>%  
+                  str_replace_all(., "_", " ") %>%  
+                  str_to_title(.))) %>% 
+  flextable() %>% 
+  bg(i = 1:40, j = 3:6, bg = colourer) %>% 
+  set_table_properties(layout = "autofit", width = .7) %>% 
+  set_caption("Reference table for modality preferences")
+
+
+```
+
+
+```{r}
+msna %>% 
+  ggplot(aes(x = income_try, y = rcsi)) + 
+  geom_point(alpha = .5) +
+  scale_x_log10() + 
+  geom_smooth(method = "lm")
+  
+```
+
+
+
+
+```{r}
+msna %>% 
+  ggplot(aes(x = rcsi)) + 
+  geom_histogram() +
+  labs(title = "Distribution of rCSI scores")
+```
+
+
+```{r}
+msna %>% 
+  ggplot(aes(x = exp_per_capita, y = rcsi)) + 
+  geom_point() + 
+  scale_x_continuous(trans = "log10") + 
+  # scale_y_log10() +
+  geom_smooth(method = "lm")
+```
+
+
+```{r}
+msna %>% 
+  mutate(basic_needs = ifelse(meet_basic_needs %in% c("Adequate", 
+                                                      "Easily able to meet needs"), 
+                              "adequate", 
+                              "inadequate"), 
+         exp_per_capita = total_expenditures / hh_size) %>% 
+  ggplot(aes(x = exp_per_capita)) + 
+  geom_histogram() + 
+  scale_x_continuous(trans = "log10") + 
+  facet_wrap(~ meet_basic_needs)
+  count(meet_basic_needs)
+```
+
+
+
+
+
+
+
+
+
