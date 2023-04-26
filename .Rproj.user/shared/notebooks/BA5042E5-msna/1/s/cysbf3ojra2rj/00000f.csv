@@ -1,0 +1,133 @@
+"0","msna %>% glimpse()
+"
+"1","Rows: 4,683"
+"1",""
+"1","
+"
+"1","Columns: 120"
+"1",""
+"1","
+"
+"1","$ id                                 [3m[38;5;246m<chr>[39m[23m ""309372051"", ""309382939"", ""309397054"", ""309404372"", ""3~
+$ weight                             [3m[38;5;246m<dbl>[39m[23m 2.369356, 2.369356, 2.351967, 2.351967, 2.351967, 2.35~
+$ idp_site                           [3m[38;5;246m<chr>[39m[23m ""No"", ""No"", ""No"", ""No"", ""No"", ""No"", ""No"", ""No"", ""No"", ~
+$ site_type                          [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA~
+$ admin1pcode                        [3m[38;5;246m<chr>[39m[23m ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02""~
+$ admin2pcode                        [3m[38;5;246m<chr>[39m[23m ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY0~
+$ admin3pcode                        [3m[38;5;246m<chr>[39m[23m ""SY020001"", ""SY020001"", ""SY020001"", ""SY020001"", ""SY020~
+$ admin4pcode                        [3m[38;5;246m<chr>[39m[23m ""C1020"", ""C1020"", ""C1020"", ""C1020"", ""C1021"", ""C1021"", ~
+$ governorate                        [3m[38;5;246m<chr>[39m[23m ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Ale~
+$ district                           [3m[38;5;246m<chr>[39m[23m ""Jebel Saman"", ""Jebel Saman"", ""Jebel Saman"", ""Jebel Sa~
+$ sub_district                       [3m[38;5;246m<chr>[39m[23m ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Ata~
+$ rcsi                               [3m[38;5;246m<dbl>[39m[23m 2, 6, 7, 2, 4, 2, 0, 4, 7, 1, 8, 0, 5, 0, 9, 1, 4, 20,~
+$ hoh_employ                         [3m[38;5;246m<chr>[39m[23m ""Yes"", ""Yes"", ""No"", ""Yes"", ""No"", ""Yes"", ""Yes"", ""Yes"", ~
+$ pop_group_sex                      [3m[38;5;246m<chr>[39m[23m ""IDPs out of camps - Male"", ""IDPs out of camps - Male""~
+$ hoh_sex                            [3m[38;5;246m<chr>[39m[23m ""Male"", ""Male"", ""Female"", ""Male"", ""Male"", ""Male"", ""Mal~
+$ pop_group                          [3m[38;5;246m<chr>[39m[23m ""IDPs out of IDP sites"", ""IDPs out of IDP sites"", ""Res~
+$ diplacement_year                   [3m[38;5;246m<chr>[39m[23m ""IDPs 2018 and before"", ""IDPs 2020"", NA, NA, NA, NA, N~
+$ return_year                        [3m[38;5;246m<chr>[39m[23m NA, NA, ""Returnees 2020"", ""Returnees 2020"", NA, ""Retur~
+$ shelter_type                       [3m[38;5;246m<chr>[39m[23m ""House/ apartment (finished)"", ""House/ apartment (unfi~
+$ modality_preference                [3m[38;5;246m<chr>[39m[23m ""Only multi-purpose cash (unconditional cash) no need ~
+$ modality_cash                      [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, ~
+$ modality_voucher                   [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ modality_in_kind                   [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, ~
+$ modality_all                       [3m[38;5;246m<dbl>[39m[23m 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, ~
+$ modality_no_preference             [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, ~
+$ modality_no_answer                 [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ income_n                           [3m[38;5;246m<chr>[39m[23m ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes""~
+$ income_currency                    [3m[38;5;246m<chr>[39m[23m ""Turkish Lira (TRY)"", ""Turkish Lira (TRY)"", ""Turkish L~
+$ income_syp                         [3m[38;5;246m<dbl>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA~
+$ income_try                         [3m[38;5;246m<dbl>[39m[23m 3800, 1400, 800, 8700, 1600, 3300, 5400, 1600, 2250, 2~
+$ exp_rent                           [3m[38;5;246m<dbl>[39m[23m 870, 100, 0, 0, 0, 0, 800, 500, 700, 0, 0, 650, 0, 0, ~
+$ exp_shelter_maintain               [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 200, 0, 0, 0, 40, 65, 0, 55, 0, 120, 250, 0, ~
+$ exp_food                           [3m[38;5;246m<dbl>[39m[23m 2600, 2300, 1300, 3600, 1000, 2500, 1500, 1250, 1350, ~
+$ exp_electricity                    [3m[38;5;246m<dbl>[39m[23m 200, 0, 0, 220, 0, 0, 0, 50, 0, 400, 0, 250, 150, 300,~
+$ exp_fuel                           [3m[38;5;246m<dbl>[39m[23m 0, 280, 0, 300, 30, 190, 200, 0, 190, 0, 30, 185, 45, ~
+$ exp_edu                            [3m[38;5;246m<dbl>[39m[23m 220, 60, 0, 150, 0, 75, 250, 20, 40, 100, 0, 0, 0, 250~
+$ exp_health                         [3m[38;5;246m<dbl>[39m[23m 150, 200, 100, 180, 80, 650, 750, 145, 0, 350, 300, 27~
+$ exp_disability                     [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 225, 0, 0, 0, 0, 0, 0, 0, 600, 0, 0, 0,~
+$ exp_clothing                       [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 1500, 300, 0, 1350, 50, 120, 200, 0, 0, 1150,~
+$ exp_water                          [3m[38;5;246m<dbl>[39m[23m 45, 70, 35, 50, 30, 150, 45, 60, 90, 110, 30, 70, 100,~
+$ exp_hygiene_items                  [3m[38;5;246m<dbl>[39m[23m 140, 100, 60, 130, 0, 130, 60, 85, 75, 75, 40, 190, 85~
+$ exp_nfi                            [3m[38;5;246m<dbl>[39m[23m 80, 0, 40, 150, 0, 0, 0, 35, 50, 30, 0, 50, 15, 0, 0, ~
+$ exp_transportation                 [3m[38;5;246m<dbl>[39m[23m 470, 300, 150, 600, 0, 300, 200, 175, 300, 400, 0, 950~
+$ exp_telecom                        [3m[38;5;246m<dbl>[39m[23m 70, 50, 30, 120, 40, 150, 70, 40, 45, 90, 50, 150, 70,~
+$ exp_debt                           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 400, 0, 0, 0, 100, 250, 225, 0, 0, 250, 750, ~
+$ exp_productive_assets              [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 720, 0, 0, 0, 0, 0, 0, 0, 0~
+$ exp_other                          [3m[38;5;246m<dbl>[39m[23m 500, 0, 0, 700, 250, 280, 0, 100, 160, 150, 60, 0, 300~
+$ total_expenditures                 [3m[38;5;246m<dbl>[39m[23m 5345, 3460, 1715, 8300, 1730, 4650, 5225, 2650, 3435, ~
+$ meet_basic_needs                   [3m[38;5;246m<chr>[39m[23m ""Insufficient"", ""Insufficient"", ""Insufficient"", ""Adequ~
+$ unable_needs_first                 [3m[38;5;246m<chr>[39m[23m ""Insufficient/lack of income"", ""Insufficient/lack of i~
+$ unable_needs_second                [3m[38;5;246m<chr>[39m[23m ""Prices increase for food and other important goods"", ~
+$ unable_needs_third                 [3m[38;5;246m<chr>[39m[23m ""No other Reasons"", ""No other Reasons"", NA, NA, ""HH no~
+$ priority_need_first                [3m[38;5;246m<chr>[39m[23m ""Shelter assistance (emergency shelter provision, shel~
+$ priority_need_second               [3m[38;5;246m<chr>[39m[23m ""Food/nutrition"", ""Food/nutrition"", ""NFI items (e.g. c~
+$ priority_need_third                [3m[38;5;246m<chr>[39m[23m ""NFI items (e.g. clothing, blankets, cooking material,~
+$ barrier_n                          [3m[38;5;246m<chr>[39m[23m ""Low wages; Lack of job opportunities; Lack of previou~
+$ barrier_low_wages                  [3m[38;5;246m<dbl>[39m[23m 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, ~
+$ barrier_lack_opportunities         [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, ~
+$ barrier_lack_experience            [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, ~
+$ barrier_expertise_mismatch         [3m[38;5;246m<dbl>[39m[23m 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, ~
+$ barrier_working_conditions         [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_lack_id                    [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_physical_access            [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_care_responsibilities      [3m[38;5;246m<dbl>[39m[23m 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, ~
+$ barrier_lack_clarity               [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, ~
+$ barrier_lack_connections           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_woman                      [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, ~
+$ barrier_idp                        [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_disability                 [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_agriculture_livestock      [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_too_old                    [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ~
+$ barrier_no_barrier                 [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, ~
+$ hours_electricity                  [3m[38;5;246m<chr>[39m[23m ""22+ hours per day"", ""9-15 hours per day"", ""9-15 hours~
+$ electricity_grid                   [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, ~
+$ electricity_communal_generator     [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ electricity_private_generator      [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ electricity_renewable              [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, ~
+$ electricity_batteries              [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ items_unable_to_afford             [3m[38;5;246m<chr>[39m[23m ""Heating fuel"", ""Cooking fuel; Solar panels and/or gen~
+$ all_items_available                [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ~
+$ unavailable_thermal_blanket        [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_blanket                [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_mattress               [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_cooking_kit            [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_cooking_fuel           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_mosquito_net           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_jerry_can              [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_plastic_sheeting       [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_torches                [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_generators             [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_adult_clothing         [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_child_clothing         [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_winter_clothing        [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_shoes                  [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_heaters                [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ unavailable_heating_fuel           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ shelter_no_damage                  [3m[38;5;246m<dbl>[39m[23m 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, ~
+$ shelter_small_holes_cracks         [3m[38;5;246m<dbl>[39m[23m 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, ~
+$ shelter_big_holes_cracks           [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, ~
+$ shelter_collapsed_roof_floor_walls [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ shelter_completely_destroyed       [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ num_children                       [3m[38;5;246m<dbl>[39m[23m NA, NA, NA, NA, NA, 1, NA, NA, NA, NA, NA, NA, NA, NA,~
+$ explosions                         [3m[38;5;246m<chr>[39m[23m ""No"", ""No"", ""Yes, less than four a day"", ""Yes, less th~
+$ civil_documentation                [3m[38;5;246m<chr>[39m[23m ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes"", ""Yes""~
+$ population_type                    [3m[38;5;246m<chr>[39m[23m ""Internally displaced person (IDP)"", ""Internally displ~
+$ host_pop_ever_displaced            [3m[38;5;246m<chr>[39m[23m NA, NA, ""Yes"", ""Yes"", ""No"", ""Yes"", ""Yes"", NA, NA, ""Yes~
+$ respondent_sex                     [3m[38;5;246m<chr>[39m[23m ""Female"", ""Male"", ""Female"", ""Male"", ""Female"", ""Male"", ~
+$ employed_3_months                  [3m[38;5;246m<chr>[39m[23m ""No"", ""Yes"", ""No"", ""Yes"", ""No"", ""Yes"", ""Yes"", ""No"", ""Y~
+$ employment_type                    [3m[38;5;246m<chr>[39m[23m NA, ""Part time"", NA, ""Full time"", NA, ""Part time"", ""Fu~
+$ hh_size                            [3m[38;5;246m<dbl>[39m[23m 5, 10, 3, 7, 6, 9, 5, 7, 5, 6, 5, 3, 10, 6, 4, 6, 4, 6~
+$ hoh_attended_school                [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA~
+$ hoh_education                      [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA~
+$ respondent_plw                     [3m[38;5;246m<chr>[39m[23m ""Yes"", NA, ""No"", NA, ""Yes"", NA, NA, ""Yes"", NA, NA, ""No~
+$ respondent_married                 [3m[38;5;246m<chr>[39m[23m ""Married"", ""Married"", ""Married"", ""Married"", ""Married"",~
+$ children_under_2                   [3m[38;5;246m<dbl>[39m[23m 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, ~
+$ exp_per_capita                     [3m[38;5;246m<dbl>[39m[23m 1069.0000, 346.0000, 571.6667, 1185.7143, 288.3333, 51~
+$ basic_needs                        [3m[38;5;246m<chr>[39m[23m ""inadequate"", ""inadequate"", ""inadequate"", ""adequate"", ~
+$ pop_group_red                      [3m[38;5;246m<chr>[39m[23m ""idp"", ""idp"", ""residents"", ""residents"", ""residents"", ""~
+$ is_idp                             [3m[38;5;246m<dbl>[39m[23m 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+$ modality_cva                       [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, ~"
+"1",""
+"1","
+"

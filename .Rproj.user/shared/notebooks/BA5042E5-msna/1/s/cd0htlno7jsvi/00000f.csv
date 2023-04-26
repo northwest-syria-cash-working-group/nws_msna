@@ -1,0 +1,11 @@
+"0","msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(non_house = 
+           ifelse(shelter_type %in% c(""House/ apartment (finished)"",
+                                      ""House/ apartment (unfinished)""), 
+                  ""House / apartment"", ""Makeshift, tent and other""), 
+         exp_food_per_capita = exp_food / hh_size) %>%
+  group_by(non_house, meet_basic_needs) %>% 
+  summarise(exp_food_per_capita = mean(exp_food_per_capita))
+"
+"2","`summarise()` has grouped output by 'non_house'. You can override using the `.groups` argument."

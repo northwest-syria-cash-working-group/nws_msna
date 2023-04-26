@@ -1,0 +1,104 @@
+"0","msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  mutate_at(vars(modality_cva, rcsi, pc_food), ~ . * weight) %>% 
+  group_by(admin3pcode) %>% 
+  summarise(pop = sum(weight), 
+            cva = sum(modality_cva, na.rm = TRUE), 
+            rcsi = sum(rcsi, na.rm = TRUE), 
+            pc_food = sum(pc_food, na.rm = TRUE)) %>% 
+  mutate(cva = cva / pop, 
+         rcsi = rcsi / pop) %>% 
+  glm(cva ~ pc_food, data = .) %>% 
+  summary()
+"
+"1","
+Call:
+"
+"1",""
+"1","glm(formula = cva ~ pc_food, data = .)"
+"1",""
+"1","
+
+"
+"1","Deviance Residuals: 
+"
+"1","     Min  "
+"1","      1Q  "
+"1","  Median  "
+"1","      3Q  "
+"1","     Max  "
+"1","
+"
+"1","-0.26713  "
+"1","-0.07523  "
+"1","-0.01100  "
+"1"," 0.09528  "
+"1"," 0.30761  "
+"1","
+"
+"1","
+Coefficients:
+"
+"1","           "
+"1","   Estimate"
+"1"," Std. Error"
+"1"," t value"
+"1","            Pr(>|t|)"
+"1","    "
+"1","
+(Intercept)"
+"1","  0.3279636"
+"1","  0.0228881"
+"1","  14.329"
+"1"," <0.0000000000000002"
+"1"," ***"
+"1","
+pc_food    "
+"1"," -0.0001737"
+"1","  0.0001827"
+"1","  -0.951"
+"1","               0.348"
+"1","    "
+"1","
+"
+"1","---
+Signif. codes:  "
+"1",""
+"1","0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1"
+"1","
+"
+"1","
+(Dispersion parameter for "
+"1",""
+"1","gaussian"
+"1",""
+"1"," family taken to be "
+"1",""
+"1","0.01551731"
+"1",""
+"1",")
+
+"
+"1",""
+"1","    Null deviance: 0.60368  on 39  degrees of freedom
+"
+"1",""
+"1","Residual deviance: 0.58966  on 38  degrees of freedom
+"
+"1","AIC: "
+"1",""
+"1","-49.169"
+"1",""
+"1","
+
+"
+"1",""
+"1","Number of Fisher Scoring iterations: "
+"1",""
+"1","2"
+"1",""
+"1","
+"
+"1","
+"

@@ -1,0 +1,33 @@
+"0","msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  left_join(not_afford$data %>% 
+              select(id, not_afford_score), 
+            by = ""id"") %>% 
+  select(rcsi, pc_food, not_afford_score) %>% 
+  # lm(pc_food ~ rcsi, data = .) %>% 
+  # summary()
+  cor(use = ""pairwise.complete.obs"", 
+      method = ""spearman"")
+"
+"1","                "
+"1","        rcsi"
+"1","      pc_food"
+"1"," not_afford_score"
+"1","
+rcsi            "
+"1"," 1.000000000"
+"1","  0.002635096"
+"1","       0.34982002"
+"1","
+pc_food         "
+"1"," 0.002635096"
+"1","  1.000000000"
+"1","      -0.07649059"
+"1","
+not_afford_score"
+"1"," 0.349820015"
+"1"," -0.076490588"
+"1","       1.00000000"
+"1","
+"

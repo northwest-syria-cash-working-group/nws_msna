@@ -1,0 +1,20 @@
+"0","msna %>% 
+  filter(!is.na(total_expenditures)) %>% 
+  mutate(pc_food = exp_food / total_expenditures) %>% 
+  select(rcsi, total_expenditures) %>% 
+  cor(use = ""pairwise.complete.obs"", 
+      method = ""pearson"")
+"
+"1","                  "
+"1","       rcsi"
+"1"," total_expenditures"
+"1","
+rcsi              "
+"1"," 1.00000000"
+"1","         0.02018883"
+"1","
+total_expenditures"
+"1"," 0.02018883"
+"1","         1.00000000"
+"1","
+"
